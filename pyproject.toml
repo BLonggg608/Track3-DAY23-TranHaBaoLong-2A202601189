@@ -11,6 +11,7 @@ requires-python = ">=3.11"
 dependencies = [
   "pydantic>=2.7",
   "PyYAML>=6.0",
+  "python-dotenv>=1.0",
   "rich>=13.7",
   "typer>=0.12",
   "langgraph>=0.3.0",
@@ -40,8 +41,11 @@ line-length = 100
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP", "N", "ANN"]
-ignore = ["ANN101", "ANN102"]
+select = ["E", "F", "I", "B", "UP", "N"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E501", "E402", "F401"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"

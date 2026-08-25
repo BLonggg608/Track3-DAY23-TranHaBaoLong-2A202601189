@@ -1,42 +1,10 @@
-"""Report generation helper."""
-
-from __future__ import annotations
-
-from datetime import datetime
-from pathlib import Path
-
-from .metrics import MetricsReport
-
-
-def render_report(metrics: MetricsReport) -> str:
-    """Render a complete lab report from metrics data.
-
-    Includes:
-    1. Metrics summary table
-    2. Per-scenario results table
-    3. Architecture explanation
-    4. Failure analysis
-    5. Improvement plan
-    """
-    date = datetime.now().strftime("%Y-%m-%d %H:%M")
-
-    # Build scenario table rows
-    scenario_rows = []
-    for sm in metrics.scenario_metrics:
-        status = "PASS" if sm.success else "FAIL"
-        scenario_rows.append(
-            f"| {sm.scenario_id} | {sm.expected_route} | {sm.actual_route or 'N/A'} | {status} "
-            f"| {sm.retry_count} | {sm.interrupt_count} |"
-        )
-    scenario_table = "\n".join(scenario_rows) if scenario_rows else "| - | - | - | - | - | - |"
-
-    report = f"""# Day 08 Lab Report
+# Day 08 Lab Report
 
 ## 1. Team / student
 
 - Name: [Student Name]
 - Repo/commit: [Git URL and commit hash]
-- Date: {date}
+- Date: 2026-08-25 17:51
 
 ## 2. Architecture
 
@@ -83,14 +51,20 @@ The support ticket agent uses LangGraph's StateGraph with 11 nodes:
 
 | Scenario | Expected | Actual | Success | Retries | Interrupts |
 |---|---|---|---|---:|---:|
-{scenario_table}
+| S01_simple | simple | simple | PASS | 0 | 0 |
+| S02_tool | tool | tool | PASS | 0 | 0 |
+| S03_missing | missing_info | missing_info | PASS | 0 | 0 |
+| S04_risky | risky | risky | PASS | 0 | 1 |
+| S05_error | error | error | PASS | 2 | 0 |
+| S06_delete | risky | risky | PASS | 0 | 1 |
+| S07_dead_letter | error | error | PASS | 1 | 0 |
 
 **Summary:**
-- Total scenarios: {metrics.total_scenarios}
-- Success rate: {metrics.success_rate:.1%}
-- Avg nodes visited: {metrics.avg_nodes_visited:.1f}
-- Total retries: {metrics.total_retries}
-- Total interrupts: {metrics.total_interrupts}
+- Total scenarios: 7
+- Success rate: 100.0%
+- Avg nodes visited: 6.4
+- Total retries: 3
+- Total interrupts: 2
 
 ## 5. Failure analysis
 
@@ -131,12 +105,3 @@ If I had one more day, I would:
 2. **LLM-as-judge evaluator** - Replace heuristic with LLM-based quality assessment
 3. **Streaming UI** - Add real-time visualization of graph execution
 4. **Metrics dashboard** - Interactive dashboard for scenario results
-"""
-    return report
-
-
-def write_report(metrics: MetricsReport, output_path: str | Path) -> None:
-    """Write the rendered report to a file."""
-    path = Path(output_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(render_report(metrics), encoding="utf-8")
